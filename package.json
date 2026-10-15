@@ -1,0 +1,16 @@
+{
+  "name": "video_streaming",
+  "version": "1.0.0",
+  "description": "A project that is insipired from youtube",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "Rishi Rai",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
