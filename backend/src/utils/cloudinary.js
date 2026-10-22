@@ -22,4 +22,19 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export default uploadOnCloudinary;
+const deleteOnCloudinary = async (cloudinary_url) => {
+    try {
+        let public_id = '';
+        for (let ch of cloudinary_url){
+            public_id += ch;
+            if (ch === "/") public_id = '' 
+        }
+        public_id = public_id.split(".")
+    
+        await cloudinary.uploader.destroy(public_id[0]);
+    } catch (error) {
+        return null;
+    }
+}
+
+export {uploadOnCloudinary, deleteOnCloudinary};

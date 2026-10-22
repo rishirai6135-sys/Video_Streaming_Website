@@ -1,7 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import {User} from "../models/user.model.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+import {deleteOnCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -52,7 +52,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-
 
     if (!avatar) throw new ApiError(400, "Avatar is file required");
 
@@ -107,6 +106,7 @@ const loginUser = asyncHandler(async(req, res) => {
         httpOnly: true,
         secure: true
     }
+
 
     return res
     .status(200)
@@ -225,6 +225,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async(req, res) => {
+    let oldAvatar = req?.user.avatar;
+
+    if (!oldAvatar) throw ApiError(400, "Avatar file is missing");
+
     const avatarLocalPath = req.file?.path;
 
     if (!avatarLocalPath) throw new ApiError(400, "Avatar file is missing");
@@ -245,12 +249,18 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
         }
     ).select("-password");
 
+    await deleteOnCloudinary(oldAvatar);
+
     return res
     .status(200)
     .json(new ApiResponse(200, user, "Avatar Updated Successfully"));
 });
 
 const updateUserCoverImage = asyncHandler(async(req, res) => {
+    let oldCoverImage = req?.user?.coverImage;
+
+    if (!oldCoverImage) throw new ApiError(400, "Cover Image not found")
+
     const coverImageLocalPath = req.file?.path;
 
     if (!coverImageLocalPath) throw new ApiError(400, "Cover Image File is missing");
@@ -270,6 +280,8 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
             new: true
         }
     ).select("-password");
+
+    await deleteOnCloudinary(oldCoverImage);
 
     return res
     .status(200)
